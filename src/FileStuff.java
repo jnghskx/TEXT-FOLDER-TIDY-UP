@@ -5,46 +5,60 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class FileStuff {
-String txtPath = "C:\\Users\\bestb\\Desktop\\this folder is far away from the project"; //can be local too
+String txtPath = "C:\\Users\\bestb\\Desktop\\this folder is far away from the project"; 
 String trashPath = "C:\\Users\\bestb\\Photos\\what are these  doing all the way over here"; 
-//do later these should be brought in with the constructor and made into paths there. 
+String moveKeyword = "temp";
+//do later these should be brought in with the constructor
+
+FileStuff(String txtPath, String trashPath, String moveKeyword){
+    this.txtPath = txtPath;
+    this.trashPath = trashPath;
+    this.moveKeyword = moveKeyword;
+}
+
+
 
 File txts = new File(txtPath);
-//BufferedReader reader = new BufferedReader(new FileReader(txtPath+"/1.txt"));
-
 File[] fileList = txts.listFiles(); //also in the constructor check if this is empty/ !dir and throw an error if there is
-
-
 Path trashDir = Paths.get(trashPath);
 
 
 
 
 void floating() throws IOException{
+    //print path of text folder & its contents for testing purposes
     System.out.println(new File(txtPath).getAbsolutePath());
-
     System.out.println(Arrays.toString(fileList)); 
 
+    //i forgot what this does
     Files.createDirectories(trashDir);
 
-    for(File filepath: fileList){
+    //go through every file in your list and check if the first line contains moveKeyword (temp rn) if it does move it to the trash folder
+    for(File fileWereOn: fileList){
 
-        Path from = filepath.toPath();
-        Path to = trashDir.resolve(filepath.getName());
+        //puts the file into a handy little variable and turn it into an abstract pathname
+        Path from = fileWereOn.toPath();
         
+        
+        //reset the first line
+        String lineOne = null; //could be declared outside foreach
 
-        String lineOne = null;
-        try(BufferedReader reader = new BufferedReader(new FileReader(filepath))){
-
+        //read the first line of the fileWereOn with a filereader, put it in lineOne, and then kill it violently 
+        try(BufferedReader reader = new BufferedReader(new FileReader(fileWereOn))){
             lineOne = reader.readLine(); 
-        } catch (Exception e) { //placeholder im gunna deal with null first lines and wrong directories later
-            System.out.println("Skipped: " + filepath.getName());
+        } catch (IOException e) { 
+            System.out.println("Skipped " + fileWereOn.getName());
         }
 
-        if (lineOne != null && lineOne.contains("temp")) {
+        //move the file
+        if (lineOne != null && lineOne.contains(moveKeyword)) {
+            //path of the potential moved file of the same name
+            Path to = trashDir.resolve(fileWereOn.getName()); 
             Files.move(from, to);
-            System.out.println("Moved: " + filepath.getName());
-            }  
+            System.out.println("MOVED " + fileWereOn.getName());
+            }  else {
+                System.out.println("Skipped " + fileWereOn.getName());
+            }
     }
 }
 }
