@@ -25,7 +25,7 @@ Path trashDir = Paths.get(trashPath);
 
 
 
-void floating() throws IOException{
+void fiftyMethodsInATrenchcoat() throws IOException{
     //print path of text folder & its contents for testing purposes
     System.out.println(new File(txtPath).getAbsolutePath());
     System.out.println(Arrays.toString(fileList)); 
