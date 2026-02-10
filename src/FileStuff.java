@@ -1,64 +1,89 @@
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-
-public class FileStuff {
-String txtPath = "C:\\Users\\bestb\\Desktop\\this folder is far away from the project"; 
-String trashPath = "C:\\Users\\bestb\\Photos\\what are these  doing all the way over here"; 
-String moveKeyword = "temp";
-//do later these should be brought in with the constructor
-
-FileStuff(String txtPath, String trashPath, String moveKeyword){
-    this.txtPath = txtPath;
-    this.trashPath = trashPath;
-    this.moveKeyword = moveKeyword;
-}
+import java.nio.file.*;
+import java.util.concurrent.*;  
 
 
+public class FileStuff extends SettingThings{
+//^ is inheriting this really needed lol //yes
 
+String txtPath = from.toString(); 
+String trashPath = to.toString(); 
+String moveKeyword = keyword; 
+
+//make file list at the directory of the txts and turn trashpath back into a path... skull emoji
 File txts = new File(txtPath);
-File[] fileList = txts.listFiles(); //also in the constructor check if this is empty/ !dir and throw an error if there is
+File[] fileList = txts.listFiles(); 
 Path trashDir = Paths.get(trashPath);
 
 
+void moveDaFilesAsynchronously(){ //self explanatory
+        ScheduledExecutorService ses = Executors.newScheduledThreadPool(fileList.length);
+        for(int i = 0; i < fileList.length; i++){
+            ses.schedule(new Moving(fileList[i]), 0, TimeUnit.SECONDS);
+        }
+        ses.shutdown(); 
+    } //THIS IS SO EXCITING I LOVE THIS
 
 
-void fiftyMethodsInATrenchcoat() throws IOException{
-    //print path of text folder & its contents for testing purposes
-    System.out.println(new File(txtPath).getAbsolutePath());
-    System.out.println(Arrays.toString(fileList)); 
+public class Moving implements Runnable{
+    int index = 0;
+    File fileWereOn;
 
-    //i forgot what this does
-    Files.createDirectories(trashDir);
+    public Moving(File fileWereOn){
+        this.fileWereOn = fileWereOn;
+    }
+    public Moving(int index, File fileWereOn){// ...just in case
+    this.index = index; this.fileWereOn = fileWereOn;
+    }
 
-    //go through every file in your list and check if the first line contains moveKeyword (temp rn) if it does move it to the trash folder
-    for(File fileWereOn: fileList){
+    String lineOne; 
+    public void run(){
 
-        //puts the file into a handy little variable and turn it into an abstract pathname
+        //makes a duplicate path version of our File
         Path from = fileWereOn.toPath();
-        
-        
-        //reset the first line
-        String lineOne = null; //could be declared outside foreach
 
-        //read the first line of the fileWereOn with a filereader, put it in lineOne, and then kill it violently 
+        //reset line one
+        lineOne = null;
+
+        //make a new file reader for our specific fileWereOn. get first line of file. destroy reader when were done.
         try(BufferedReader reader = new BufferedReader(new FileReader(fileWereOn))){
-            lineOne = reader.readLine(); 
-        } catch (IOException e) { 
-            System.out.println("Skipped " + fileWereOn.getName());
+            lineOne = reader.readLine();
+            if (lineOne == null){
+                throw new IOException(); //cry about it
+            }
+        } catch(IOException e){
+            System.out.println("Skipped "+fileWereOn.getName()+" 'io' forgiveo youo");
+
         }
 
-        //move the file
-        if (lineOne != null && lineOne.contains(moveKeyword)) {
-            //path of the potential moved file of the same name
-            Path to = trashDir.resolve(fileWereOn.getName()); 
-            Files.move(from, to);
-            System.out.println("MOVED " + fileWereOn.getName());
-            }  else {
-                System.out.println("Skipped " + fileWereOn.getName());
+        if(lineOne.contains(moveKeyword)){
+            //make path in trash folder to put the moved file in
+            Path to = trashDir.resolve(fileWereOn.getName());
+
+            //sigh. move.
+            System.out.println("attempting to move file in 15 seconds");
+            try {
+                Thread.sleep(15000);
+            } catch (InterruptedException e) {
+                e.printStackTrace(); System.out.println(" ...:( ?");
             }
-    }
+
+            try {
+                Files.move(from, to);
+                System.out.println("MOVED " + fileWereOn.getName());
+            } catch (IOException ex) {
+                System.out.println("io skipped " + fileWereOn.getName());
+            }
+
+            //YAY!!! 
+        }
+    } 
+
+    
+
+
+
 }
+
+
 }

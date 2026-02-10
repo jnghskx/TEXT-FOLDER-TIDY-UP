@@ -29,6 +29,7 @@ public class SettingThings {
     Path selectNewDirectory(){ 
         JFileChooser chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        
 
         int result = chooser.showOpenDialog(null);
 
@@ -43,57 +44,66 @@ public class SettingThings {
 
     
     void confirmFromDir(){
-        String yesno = "n";
 
-        try (Scanner scanner = new Scanner(System.in)) {
+        //ask if user wants to change directory
+        String yesno = "n";
+        Scanner scanner = new Scanner(System.in);
             System.out.println(from);
             System.out.println("Are you sure you want to take files FROM this directory? [Y/N]");
-            yesno = scanner.next();
-        }
+            yesno = scanner.nextLine();
+            
 
-        if(!yesno.toLowerCase().equals("y")){
-                Path newItem = selectNewDirectory();
-                from = newItem;
-                properties.setProperty("trashPath", newItem.toString());
-                try(FileOutputStream outputStream = new FileOutputStream("config.properties")){
-                    properties.store(outputStream, null);
-                }catch(IOException e){
-                    System.out.println("fuck you");
-                }
-            } else {
-                return;
+        if(yesno.toLowerCase().equals("n")){
+
+            //get new directory 
+            System.out.println("Selecting new directory");
+            System.out.println("the dialogue is open just tab into it i dont feel like making a parent frame");
+            Path newItem = selectNewDirectory(); 
+
+            //put the new directory in from and update the properties file for next launch
+            from = newItem; 
+            properties.setProperty("trashPath", newItem.toString());
+            try(FileOutputStream outputStream = new FileOutputStream("config.properties")){
+                properties.store(outputStream, null);
+            }catch(IOException e){
+                System.out.println("io");
             }
-
-        confirmFromDir();
+            //ask again
+            confirmFromDir(); //maybe dont do this
+        }
+            
     }
 
     void confirmToDir(){
 
+         //ask if user wants to change directory
         String yesno = "n";
-        try (Scanner scanner = new Scanner(System.in)) {
-            System.out.println(to);
-            System.out.println("Are you sure you want to send files TO this directory? [Y/N]");
-            //System.out.println("Also write [just delete them] if u wanna just delete them");
-            yesno = scanner.next();
+        Scanner scanner = new Scanner(System.in);
+            System.out.println(from);
+            System.out.println("Are you sure you want to bring files TO this directory? [Y/N]");
+            yesno = scanner.nextLine();
+            
 
-            if(!yesno.toLowerCase().equals("y")){
-                Path newItem = selectNewDirectory();
-                to = newItem;
-                properties.setProperty("trashPath", newItem.toString());
-                try(FileOutputStream outputStream = new FileOutputStream("config.properties")){
-                    properties.store(outputStream, null);
-                }catch(IOException e){
-                    System.out.println("fuck you");
-                }
-            } else {
-                return;
+        if(yesno.toLowerCase().equals("n")){
+
+            //get new directory 
+            System.out.println("Selecting new directory");
+            System.out.println("the dialogue is open just tab into it i dont feel like making a parent frame");
+            Path newItem = selectNewDirectory(); 
+            
+            //put the new directory in from and update the properties file for next launch
+            to = newItem; 
+            properties.setProperty("trashPath", newItem.toString());
+            try(FileOutputStream outputStream = new FileOutputStream("config.properties")){
+                properties.store(outputStream, null);
+            }catch(IOException e){
+                System.out.println("io.. its ok. i still love yuo.");
             }
-
-            confirmToDir();
+            //ask again
+            confirmToDir(); //maybe dont do this
         }
     }
 
-    //todo re test these methods. and print the variables in this class. 
 
     void confirmKeywords(){
         
